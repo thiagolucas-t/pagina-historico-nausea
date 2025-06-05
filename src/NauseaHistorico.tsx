@@ -19,19 +19,47 @@ const NauseaHistorico: React.FC = () => {
 
   const [mallampati, setMallampati] = useState('');
 
-
   const [resposta, setResposta] = useState<string>("");
 
-const estiloCampo = (disabled: boolean): React.CSSProperties => ({
-  width: '100%',
-  padding: '0.3rem',
-  border: 'none',
-  backgroundColor: disabled ? '#f0f0f0' : 'white',
-  opacity: disabled ? 0.6 : 1,
-  pointerEvents: disabled ? 'none' : 'auto',
-  boxSizing: 'border-box',
-  outline: 'none',
-});
+  const [asa, setAsa] = useState('');
+
+  const [ecg, setEcg] = useState("");
+  const [outroTexto, setOutroTexto] = useState("");
+
+  const [respostaEmergencia, setRespostaEmergencia] = useState('');
+
+  const [valores, setValores] = useState({
+    hb: '', ht: '', na: '', k: '', plaquetas: '', glicose: ''
+  });
+
+  const handleChange = (campo: keyof typeof valores, valor: string) => {
+    setValores({ ...valores, [campo]: valor });
+  };
+
+  const estiloInput: React.CSSProperties = {
+    width: '100%',
+    padding: '0.3rem',
+    border: 'none',
+    backgroundColor: 'white',
+    outline: 'none',
+    textAlign: 'center',
+    boxSizing: 'border-box'
+  };  
+
+  const estiloCampo = (disabled: boolean): React.CSSProperties => ({
+    width: '100%',
+    padding: '0.3rem',
+    border: 'none',
+    backgroundColor: disabled ? '#f0f0f0' : 'white',
+    opacity: disabled ? 0.6 : 1,
+    pointerEvents: disabled ? 'none' : 'auto',
+    boxSizing: 'border-box',
+    outline: 'none',
+  });
+
+  const [negativo, setNegativo] = useState(false);
+  const [tipagem, setTipagem] = useState('');
+  const [reserva, setReserva] = useState(''); 
 
 
   // Alergias
@@ -477,6 +505,390 @@ const estiloCampo = (disabled: boolean): React.CSSProperties => ({
         </div>
       </div>
 
+      {/* LABORATÓRIO */}
+      <div style={{ fontFamily: 'Arial, sans-serif', display: 'flex', flexDirection: 'column', paddingTop: '2rem' }}>
+      <strong>Laboratório</strong>
+
+      <div style={{ width: '31.25rem' }}>
+        <table style={{ borderCollapse: 'collapse', width: '100%', marginTop: '1rem', tableLayout: 'fixed', border: '1px solid black' }}>
+          <thead>
+            <tr style={{ backgroundColor: '#ddd' }}>
+              <th style={{ border: '1px solid black', padding: '0.5rem' }}>Hb</th>
+              <th style={{ border: '1px solid black', padding: '0.5rem' }}>Ht</th>
+              <th style={{ border: '1px solid black', padding: '0.5rem' }}>Na</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ border: '1px solid black', padding: '0' }}>
+                <input
+                  type="text"
+                  value={valores.hb}
+                  onChange={(e) => handleChange('hb', e.target.value)}
+                  style={estiloInput}
+                />
+              </td>
+              <td style={{ border: '1px solid black', padding: '0' }}>
+                <input
+                  type="text"
+                  value={valores.ht}
+                  onChange={(e) => handleChange('ht', e.target.value)}
+                  style={estiloInput}
+                />
+              </td>
+              <td style={{ border: '1px solid black', padding: '0' }}>
+                <input
+                  type="text"
+                  value={valores.na}
+                  onChange={(e) => handleChange('na', e.target.value)}
+                  style={estiloInput}
+                />
+              </td>
+            </tr>
+            <tr style={{ backgroundColor: '#ddd', fontWeight: 'bold' }}>
+              <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>K</td>
+              <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>Plaquetas</td>
+              <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>Glicose</td>
+            </tr>
+            <tr>
+              <td style={{ border: '1px solid black', padding: '0' }}>
+                <input
+                  type="text"
+                  value={valores.k}
+                  onChange={(e) => handleChange('k', e.target.value)}
+                  style={estiloInput}
+                />
+              </td>
+              <td style={{ border: '1px solid black', padding: '0' }}>
+                <input
+                  type="text"
+                  value={valores.plaquetas}
+                  onChange={(e) => handleChange('plaquetas', e.target.value)}
+                  style={estiloInput}
+                />
+              </td>
+              <td style={{ border: '1px solid black', padding: '0' }}>
+                <input
+                  type="text"
+                  value={valores.glicose}
+                  onChange={(e) => handleChange('glicose', e.target.value)}
+                  style={estiloInput}
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </div>
+
+      {/* MEDICAÇÃO */}
+      <div style={{ marginBottom: '2rem', marginTop: '2rem' }}>
+
+        <div style={{ display: 'flex', width: 'max-content', flexDirection: 'column', gap: '1rem', alignItems: 'flex-start' }}>
+          <table
+            style={{
+              borderCollapse: 'collapse',
+              width: '31.25rem',
+              height: '1rem',
+              textAlign: 'center',
+              tableLayout: 'fixed',
+            }}
+          >
+            <thead>
+              <tr style={{ backgroundColor: '#ddd' }}>
+                <th style={{ border: '1px solid black', padding: '0.5rem' }}>Medicação(verificarsetomounodiadacirurgia)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {alergias.map((item, index) => (
+                <tr key={index}>
+                  <td style={{ border: '1px solid black' }}>
+                    <input
+                      type="text"
+                      value={item.tipo}
+                      onChange={(e) => handleAlergiaChange(index, 'tipo', e.target.value)}
+                      disabled={alergiaNegativo}
+                      style={estiloCampo(alergiaNegativo)}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div style={{ display: 'flex', alignSelf: 'center', flexDirection: 'row', gap: '0.5rem' }}>
+            <button
+              onClick={adicionarAlergia}
+              disabled={alergiaNegativo}
+              style={{
+                width: '40px',
+                height: '40px',
+                backgroundColor: 'lightgray',
+                border: 'none',
+                borderRadius: '10px',
+                fontSize: '24px',
+                fontWeight: 'bold',
+                color: '#000',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                opacity: alergiaNegativo ? 0.5 : 1,
+              }}
+            >
+              +
+            </button>
+            <button
+              onClick={removerAlergia}
+              disabled={alergiaNegativo || alergias.length <= 1}
+              style={{
+                width: '40px',
+                height: '40px',
+                backgroundColor: 'lightgray',
+                border: 'none',
+                borderRadius: '10px',
+                fontSize: '24px',
+                fontWeight: 'bold',
+                color: '#000',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                opacity: alergiaNegativo ? 0.5 : 1,
+              }}
+            >
+              −
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* DISTÂNCIA ESTERNO/MENTO */}
+      <div style={{ marginTop: '2rem' }}>
+        <strong>Distância esterno/mento</strong>
+
+        <div style={{}}>
+          <div style={{ marginBottom: '0.5rem' }}>
+            <label>
+              11cm
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              <input
+                type="radio"
+                name="cardiaco"
+                value="sim"
+                checked={cardiaco === 'sim'}
+                onChange={() => setCardiaco('sim')}
+              />{' '}
+              (SIM)
+            </label>
+            <label style={{ marginLeft: '1rem' }}>
+              <input
+                type="radio"
+                name="cardiaco"
+                value="nao"
+                checked={cardiaco === 'nao'}
+                onChange={() => setCardiaco('nao')}
+              />{' '}
+              (NÃO)
+            </label>
+          </div>
+        </div>      
+     </div>
+
+      {/* DENTIÇÃO/PROGNIMATISMO e OUTROS */}
+      <div style={{ marginTop: '2rem' }}>
+        <label style={{ fontWeight: 'bold' }}>Dentição/Prognimatismo</label>
+
+        <div style={{ marginTop: '1rem' }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <input
+              type="text"
+              value={neuroRegional}
+              onChange={(e) => setNeuroRegional(e.target.value)}
+              style={{
+                border: 'none',
+                borderBottom: '2px solid black',
+                outline: 'none',
+                width: '20rem',
+              }}
+            />
+          </div>
+        </div>
+       </div>
+
+      <div style={{ marginTop: '2rem' }}>
+        <label style={{ fontWeight: 'bold' }}>OUTROS</label>
+
+        <div style={{ marginTop: '1rem' }}>
+          <div style={{ marginBottom: '1rem' }}>
+            <input
+              type="text"
+              value={neuroRegional}
+              onChange={(e) => setNeuroRegional(e.target.value)}
+              style={{
+                border: 'none',
+                borderBottom: '2px solid black',
+                outline: 'none',
+                width: '20rem',
+              }}
+            />
+          </div>
+        </div>
+       </div>
+
+      {/* HEMORRAGIAS */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem', marginTop: '2rem' }}>
+        <strong>Hemorragias</strong>
+        <label>
+          <input
+            type="checkbox"
+            checked={alergiaNegativo}
+            onChange={() => setAlergiaNegativo(!alergiaNegativo)}
+          />{' '}
+          Negativo
+        </label>
+      </div>     
+
+      <div className="tipagem-container">
+        <div className="linha-input">
+          <label>Tipagem solicitada</label>
+          <input type="text" className="linha" />
+        </div>
+
+        <div className="linha-input">
+          <label>Reserva de</label>
+          <input type="text" className="linha pequeno" />
+          <span>U conc. Glob</span>
+        </div>
+      </div>
+
+      {/* ASA */}
+      <div style={{ marginTop: '2rem' }}>
+        <strong>ASA</strong>
+
+          <div style={{ marginTop: '0.5rem', display: 'flex', gap: '2rem', alignItems: 'center' }}>
+            <label>
+              <input
+                type="radio"
+                name="asa"
+                value="I"
+                checked={asa === 'I'}
+                onChange={() => setAsa('I')}
+              />{' '}
+              I
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="asa"
+                value="II"
+                checked={asa === 'II'}
+                onChange={() => setAsa('II')}
+              />{' '}
+              II
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="asa"
+                value="III"
+                checked={asa === 'III'}
+                onChange={() => setAsa('III')}
+              />{' '}
+              III
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="asa"
+                value="IV"
+                checked={asa === 'IV'}
+                onChange={() => setAsa('IV')}
+              />{' '}
+              IV
+            </label>
+          </div>
+
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '3rem', marginTop: '0.5rem' }}>
+        <strong>Emergência</strong>
+        <label>
+          <input
+            type="radio"
+            name="emergencia"
+            value="sim"
+            checked={respostaEmergencia === 'sim'}
+            onChange={() => setRespostaEmergencia('sim')}
+          />
+          Sim
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="emergencia"
+            value="nao"
+            checked={respostaEmergencia === 'nao'}
+            onChange={() => setRespostaEmergencia('nao')}
+          />
+          Não
+        </label>
+      </div>
+
+      {/* EXAMES COMPLEMENTARES */}
+
+   <div className="exames-container">
+      <strong>EXAMES COMPLEMENTARES:</strong>
+
+      <div className="subtitulo">ECG:</div>
+
+      <div className="descricao">
+        RITMO SINUSAL, AUSÊNCIAS DE ARRITMIAS / SOBRECARGAS OU ISQUEMIAS AGUDAS
+      </div>
+
+      <div className="opcoes">
+        <label>
+          <input
+            type="radio"
+            name="ecg"
+            value="sim"
+            checked={ecg === "sim"}
+            onChange={() => setEcg("sim")}
+          />
+          (SIM)
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="ecg"
+            value="nao"
+            checked={ecg === "nao"}
+            onChange={() => setEcg("nao")}
+          />
+          (NÃO)
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="ecg"
+            value="outro"
+            checked={ecg === "outro"}
+            onChange={() => setEcg("outro")}
+          />
+          (OUTRO:
+          <input
+            type="text"
+            className="campo-outro"
+            disabled={ecg !== "outro"}
+            value={outroTexto}
+            onChange={(e) => setOutroTexto(e.target.value)}
+          />
+          )
+        </label>
+      </div>
+    </div>
+       
     </div>
   );
 };
